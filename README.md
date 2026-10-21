@@ -3,87 +3,88 @@
 </p>
 
 <p align="center">
-  Yakındaki hizmet verenlerle hizmet arayanları harita üzerinde buluşturan<br>
-  web ve mobil yerel hizmet platformu.
+  A web and mobile local-services marketplace that connects customers<br>
+  with nearby service providers through location-based discovery.
 </p>
 
 <p align="center">
-  <strong>Flutter Mobil</strong> · <strong>Düz PHP Web/API</strong> · <strong>PostgreSQL</strong> · <strong>Yönetim Paneli</strong>
+  <strong>Flutter Mobile</strong> · <strong>Vanilla PHP Web/API</strong> · <strong>PostgreSQL</strong> · <strong>Admin Panel</strong>
 </p>
 
-## Web sitesi
+## Website
 
-Web arayüzü; hizmet arama, gelişmiş filtreleme, harita/liste görünümü, ilan
-oluşturma, favoriler, mesajlaşma ve profil yönetimini içerir. Aynı PHP uygulaması
-`/api/v1` REST API'sini ve ayrı oturum kullanan yönetim panelini de sunar.
+The web interface includes service discovery, advanced filters, map and list
+views, listing creation, favorites, messaging, and profile management. The same
+PHP application also provides the versioned `/api/v1` REST API and an admin
+panel with a separate authentication session.
 
-![Tanıdıkla web ana sayfası](docs/screenshots/web-home.png)
+![Tanıdıkla website homepage](docs/screenshots/web-home.png)
 
-## Mobil uygulama
+## Mobile application
 
-Flutter uygulaması web sitesiyle aynı API ve veritabanını kullanır. Yakındaki
-hizmetleri keşfetme, hizmet verme/alma ilanı oluşturma, mesajlaşma, bildirim ve
-profil işlemleri iki istemcide ortak çalışır.
+The Flutter application uses the same API and database as the website. Nearby
+service discovery, service offer/request listings, messaging, notifications,
+and profile operations work consistently across both clients.
 
 <table>
   <tr>
-    <td align="center"><img src="docs/screenshots/mobile-login.png" alt="Mobil giriş" width="260"></td>
-    <td align="center"><img src="docs/screenshots/mobile-discovery.png" alt="Mobil keşif" width="260"></td>
-    <td align="center"><img src="docs/screenshots/mobile-create-listing.png" alt="Mobil ilan oluşturma" width="260"></td>
+    <td align="center"><img src="docs/screenshots/mobile-login.png" alt="Mobile login" width="260"></td>
+    <td align="center"><img src="docs/screenshots/mobile-discovery.png" alt="Mobile discovery" width="260"></td>
+    <td align="center"><img src="docs/screenshots/mobile-create-listing.png" alt="Mobile listing creation" width="260"></td>
   </tr>
   <tr>
-    <td align="center"><strong>Giriş ve kayıt</strong></td>
-    <td align="center"><strong>Yakındaki hizmetler</strong></td>
-    <td align="center"><strong>İlan oluşturma</strong></td>
+    <td align="center"><strong>Login and registration</strong></td>
+    <td align="center"><strong>Nearby services</strong></td>
+    <td align="center"><strong>Listing creation</strong></td>
   </tr>
 </table>
 
-## Proje yapısı
+## Repository structure
 
 ```text
 tanidikla/
-├── mobile/        Flutter mobil uygulaması
-├── web-platform/  PHP web sitesi, REST API ve admin paneli
-└── docs/          Repo görselleri ve ortak dokümantasyon
+├── mobile/        Flutter mobile application
+├── web-platform/  PHP website, REST API, and admin panel
+└── docs/          Repository screenshots and shared documentation
 ```
 
 ```text
-Flutter uygulaması ─┐
-                    ├── /api/v1 (PHP) ── PostgreSQL
-Web sitesi ─────────┘          │
-                               └── Yönetim paneli
+Flutter application ─┐
+                     ├── /api/v1 (PHP) ── PostgreSQL
+Website ─────────────┘          │
+                                └── Admin panel
 ```
 
-## Öne çıkan özellikler
+## Key features
 
-- Konuma göre hizmet ve iş ilanı keşfi
-- Harita/liste görünümü, kategori ve mesafe filtreleri
-- Tek hesapla hizmet verme ve hizmet alma ilanları
-- İlan görselleri, favoriler, kayıtlı aramalar ve bildirimler
-- İlan bazlı kullanıcı mesajlaşması ve gerçek zamanlı güncelleme desteği
-- Web oturumu, mobil access/refresh token akışı ve CSRF koruması
-- Moderasyon, rol tabanlı yetki, rapor ve audit kayıtları
-- KVKK/yasal metin, veri dışa aktarma ve hesap anonimleştirme akışları
-- SEO uyumlu ilan/kategori sayfaları, sitemap ve yapılandırılmış veri
+- Location-based service and job listing discovery
+- Map/list views with category and distance filters
+- Service offer and service request listings from a single account
+- Listing images, favorites, saved searches, and notifications
+- Listing-based user messaging with real-time update support
+- Web sessions, mobile access/refresh tokens, and CSRF protection
+- Moderation, role-based permissions, reports, and audit logs
+- Privacy/legal document versioning, data export, and account anonymization
+- SEO-friendly listing/category pages, sitemap, and structured data
 
-## Gereksinimler
+## Requirements
 
 ### Web/API
 
-- PHP 8.4 veya 8.5
-- PostgreSQL (production için PostGIS önerilir)
+- PHP 8.4 or 8.5
+- PostgreSQL (PostGIS is recommended for production)
 - Composer
-- PHP eklentileri: `curl`, `fileinfo`, `gd`, `mbstring`, `openssl`,
-  `pdo_pgsql`, `pgsql`
+- PHP extensions: `curl`, `fileinfo`, `gd`, `mbstring`, `openssl`,
+  `pdo_pgsql`, and `pgsql`
 
-### Mobil
+### Mobile
 
-- Flutter SDK ve Dart `^3.10.4`
-- Android Studio veya Xcode
+- Flutter SDK with Dart `^3.10.4`
+- Android Studio or Xcode
 
-## Lokal çalıştırma
+## Running locally
 
-### 1. Web sitesi ve API
+### 1. Website and API
 
 ```powershell
 cd web-platform
@@ -94,13 +95,13 @@ php -c php.ini bin/seed.php
 ./dev.ps1
 ```
 
-Lokal adresler:
+Local endpoints:
 
-- Web: `http://127.0.0.1:8080`
-- API sağlık kontrolü: `http://127.0.0.1:8080/api/v1/health`
-- Admin girişi: `http://127.0.0.1:8080/admin/giris`
+- Website: `http://127.0.0.1:8080`
+- API health check: `http://127.0.0.1:8080/api/v1/health`
+- Admin login: `http://127.0.0.1:8080/admin/giris`
 
-### 2. Mobil uygulama
+### 2. Mobile application
 
 ```powershell
 cd mobile
@@ -108,17 +109,17 @@ flutter pub get
 flutter run --dart-define-from-file=config/api.local.json
 ```
 
-Android emülatörü lokal API'ye `http://10.0.2.2:8080/api/v1` üzerinden ulaşır.
-Farklı bir sunucu için:
+The Android emulator reaches the local API through
+`http://10.0.2.2:8080/api/v1`. To use a different server:
 
 ```powershell
-flutter run --dart-define=API_BASE_URL=https://alan-adiniz.com/api/v1
+flutter run --dart-define=API_BASE_URL=https://your-domain.com/api/v1
 ```
 
-## Kalite kontrolleri
+## Quality checks
 
 ```powershell
-# Mobil
+# Mobile
 cd mobile
 flutter analyze
 flutter test
@@ -130,24 +131,25 @@ php -c php.ini tests/seo-static-smoke.php
 php -c php.ini tests/trust-marketplace-static-smoke.php
 ```
 
-## Yapılandırma ve güvenlik
+## Configuration and security
 
-Gerçek parolalar, API anahtarları, yerel veritabanı, loglar ve kullanıcı
-yüklemeleri Git'e eklenmez. Web yapılandırması için
-`web-platform/.env.example`, mobil API adresi için `mobile/config/api.example.json`
-kullanılır.
+Real passwords, API keys, the local database, logs, and user uploads are never
+committed to Git. Use `web-platform/.env.example` for web configuration and
+`mobile/config/api.example.json` for the mobile API endpoint.
 
-Production kurulumu öncesinde güçlü bir `APP_KEY`, ayrı veritabanı kullanıcısı,
-HTTPS, SMTP ve üretim trafiğine uygun harita sağlayıcısı yapılandırılmalıdır.
+Before deploying to production, configure a strong `APP_KEY`, a dedicated
+database user, HTTPS, SMTP, and a map tile provider suitable for production
+traffic.
 
-## Ayrıntılı belgeler
+## Detailed documentation
 
-- [Web/API kurulumu](web-platform/README.md)
-- [Production dağıtımı](web-platform/docs/DEPLOYMENT.md)
-- [API sözleşmesi](web-platform/docs/api-contract.md)
-- [Mobil mimari](mobile/docs/architecture.md)
-- [Mobil uygulama notları](mobile/README.md)
+- [Web/API setup](web-platform/README.md)
+- [Production deployment](web-platform/docs/DEPLOYMENT.md)
+- [API contract](web-platform/docs/api-contract.md)
+- [Mobile architecture](mobile/docs/architecture.md)
+- [Mobile application notes](mobile/README.md)
 
-## Lisans
+## License
 
-Bu proje özel geliştirmedir. İzinsiz kullanım, kopyalama ve dağıtım yapılamaz.
+This is a privately developed project. Unauthorized use, copying, or
+distribution is prohibited.
