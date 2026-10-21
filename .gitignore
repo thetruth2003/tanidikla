@@ -1,0 +1,62 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+*.jks
+*.keystore
+key.properties
+google-services.json
+GoogleService-Info.plist
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# PHP web runtime
+web-platform/vendor/
+web-platform/storage/postgres/
+web-platform/storage/logs/*
+web-platform/storage/cache/*
+web-platform/storage/backups/*
+web-platform/storage/uploads/*
+!web-platform/storage/logs/.gitkeep
+!web-platform/storage/cache/.gitkeep
+!web-platform/storage/backups/.gitkeep
+!web-platform/storage/uploads/.gitkeep
+
+# Flutter/Dart generated output
+mobile/.dart_tool/
+mobile/.flutter-plugins-dependencies
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+mobile/coverage/
+mobile/**/Flutter/.last_build_id
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+mobile/android/local.properties
+mobile/android/.kotlin/
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/flutter_export_environment.sh
+mobile/ios/Flutter/ephemeral/
+mobile/macos/Flutter/ephemeral/
+mobile/windows/flutter/ephemeral/
+mobile/config/supabase.dev.json
+
+# Local investigation and old release artifacts
+/server-release/
+/*.zip
+/*.xml
+/aninda_*.png
+/ankara_*.png
+/CURRENT_SYSTEM_AUDIT.md
+/IMPLEMENTATION_REPORT.md
+

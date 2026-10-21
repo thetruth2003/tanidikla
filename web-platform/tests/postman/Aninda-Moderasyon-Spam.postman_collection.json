@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "Anında - İlan Moderasyon ve Spam",
+    "description": "Yalnızca test hesabı ve test ortamında çalıştırın. Pending görünürlüğü, idempotency, kopya ilan engeli ve yönetici onayını doğrular.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8080" },
+    { "key": "email", "value": "test-user@example.test" },
+    { "key": "password", "value": "TestPassword!2026" },
+    { "key": "admin_email", "value": "admin@example.test" },
+    { "key": "admin_password", "value": "AdminPassword!2026" },
+    { "key": "category_id", "value": "electrician" },
+    { "key": "csrf", "value": "" },
+    { "key": "admin_csrf", "value": "" },
+    { "key": "submission_key", "value": "" },
+    { "key": "duplicate_key", "value": "" },
+    { "key": "listing_id", "value": "" },
+    { "key": "listing_title", "value": "" },
+    { "key": "listing_description", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 - Kullanıcı CSRF",
+      "request": { "method": "GET", "url": "{{base_url}}/api/v1/auth/csrf" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('CSRF alındı', function () { pm.response.to.have.status(200); });",
+        "pm.collectionVariables.set('csrf', pm.response.json().data.csrf_token);"
+      ] } }]
+    },
+    {
+      "name": "02 - Kullanıcı girişi",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrf}}" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}" },
+        "url": "{{base_url}}/api/v1/auth/login"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const json = pm.response.json();",
+        "pm.test('Kullanıcı girişi başarılı', function () { pm.response.to.have.status(200); });",
+        "pm.collectionVariables.set('csrf', json.data.session.csrf_token);"
+      ] } }]
+    },
+    {
+      "name": "03 - İlan oluştur (pending)",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [
+          "const stamp = Date.now().toString();",
+          "pm.collectionVariables.set('submission_key', 'postman-primary-' + stamp + '-0000');",
+          "pm.collectionVariables.set('listing_title', 'Postman güvenlik testi ' + stamp);",
+          "pm.collectionVariables.set('listing_description', 'Onay, idempotency ve kopya ilan koruması için oluşturulan test ilanı ' + stamp + '.');"
+        ] } },
+        { "listen": "test", "script": { "exec": [
+          "const json = pm.response.json();",
+          "pm.test('İlan onay bekliyor', function () { pm.response.to.have.status(202); pm.expect(json.data.status).to.eql('pending'); });",
+          "pm.collectionVariables.set('listing_id', json.data.id);"
+        ] } }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrf}}" }, { "key": "Idempotency-Key", "value": "{{submission_key}}" }],
+        "body": { "mode": "raw", "raw": "{\n  \"listing_type\": \"service_offer\",\n  \"location\": {\"latitude\": 39.9334, \"longitude\": 32.8597, \"city\": \"Ankara\", \"district\": \"Çankaya\", \"neighborhood\": \"Kızılay\", \"precision\": \"neighborhood\"},\n  \"items\": [{\"category_id\": \"{{category_id}}\", \"title\": \"{{listing_title}}\", \"description\": \"{{listing_description}}\", \"pricing_unit\": \"negotiable\", \"price_amount\": null, \"price_includes_vat\": false, \"urgent\": false, \"open_24_7\": false, \"schedule_label\": \"\"}]\n}" },
+        "url": "{{base_url}}/api/v1/listings"
+      }
+    },
+    {
+      "name": "04 - Aynı istek anahtarı aynı ilanı döndürür",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrf}}" }, { "key": "Idempotency-Key", "value": "{{submission_key}}" }],
+        "body": { "mode": "raw", "raw": "{\n  \"listing_type\": \"service_offer\",\n  \"location\": {\"latitude\": 39.9334, \"longitude\": 32.8597, \"city\": \"Ankara\", \"district\": \"Çankaya\", \"neighborhood\": \"Kızılay\", \"precision\": \"neighborhood\"},\n  \"items\": [{\"category_id\": \"{{category_id}}\", \"title\": \"{{listing_title}}\", \"description\": \"{{listing_description}}\", \"pricing_unit\": \"negotiable\", \"price_amount\": null, \"price_includes_vat\": false, \"urgent\": false, \"open_24_7\": false, \"schedule_label\": \"\"}]\n}" },
+        "url": "{{base_url}}/api/v1/listings"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const json = pm.response.json();",
+        "pm.test('İkinci ilan oluşmadı', function () { pm.response.to.have.status(202); pm.expect(json.data.id).to.eql(pm.collectionVariables.get('listing_id')); });"
+      ] } }]
+    },
+    {
+      "name": "05 - Aynı içerik yeni anahtarla engellenir",
+      "event": [{ "listen": "prerequest", "script": { "exec": [
+        "pm.collectionVariables.set('duplicate_key', 'postman-duplicate-' + Date.now() + '-0000');"
+      ] } }, { "listen": "test", "script": { "exec": [
+        "pm.test('Kopya ilan 409', function () { pm.response.to.have.status(409); pm.expect(pm.response.json().error.code).to.eql('duplicate_listing'); });"
+      ] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrf}}" }, { "key": "Idempotency-Key", "value": "{{duplicate_key}}" }],
+        "body": { "mode": "raw", "raw": "{\n  \"listing_type\": \"service_offer\",\n  \"location\": {\"latitude\": 39.9334, \"longitude\": 32.8597, \"city\": \"Ankara\", \"district\": \"Çankaya\", \"neighborhood\": \"Kızılay\", \"precision\": \"neighborhood\"},\n  \"items\": [{\"category_id\": \"{{category_id}}\", \"title\": \"{{listing_title}}\", \"description\": \"{{listing_description}}\", \"pricing_unit\": \"negotiable\", \"price_amount\": null, \"price_includes_vat\": false, \"urgent\": false, \"open_24_7\": false, \"schedule_label\": \"\"}]\n}" },
+        "url": "{{base_url}}/api/v1/listings"
+      }
+    },
+    {
+      "name": "06 - Pending ilan herkesten gizli",
+      "request": { "method": "GET", "url": "{{base_url}}/api/v1/listings/{{listing_id}}" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Pending ilan public değil', function () { pm.response.to.have.status(404); });"
+      ] } }]
+    },
+    {
+      "name": "07 - Pending ilan sahibine görünür",
+      "request": { "method": "GET", "url": "{{base_url}}/api/v1/me/listings" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const ids = pm.response.json().data.items.map(item => item.id);",
+        "pm.test('Sahip ilanı görüyor', function () { pm.response.to.have.status(200); pm.expect(ids).to.include(pm.collectionVariables.get('listing_id')); });"
+      ] } }]
+    },
+    {
+      "name": "08 - Admin giriş sayfası",
+      "request": { "method": "GET", "url": "{{base_url}}/admin/giris" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Admin ön oturumu hazır', function () { pm.response.to.have.status(200); });"
+      ] } }]
+    },
+    {
+      "name": "09 - Admin girişi",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}" },
+        "url": "{{base_url}}/api/v1/admin/auth/login"
+      },
+      "event": [{ "listen": "prerequest", "script": { "exec": [
+        "const cookie = pm.cookies.get('ankara_admin_pre_csrf');",
+        "pm.request.headers.upsert({ key: 'X-CSRF-Token', value: cookie || '' });"
+      ] } }, { "listen": "test", "script": { "exec": [
+        "pm.test('Admin girişi başarılı', function () { pm.response.to.have.status(200); });"
+      ] } }]
+    },
+    {
+      "name": "10 - Admin ilanı onaylar",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"status\": \"active\",\n  \"note\": \"Postman güvenlik testi onayı\"\n}" },
+        "url": "{{base_url}}/api/v1/admin/listings/{{listing_id}}/moderation"
+      },
+      "event": [{ "listen": "prerequest", "script": { "exec": [
+        "const cookie = pm.cookies.get('ankara_admin_csrf');",
+        "pm.request.headers.upsert({ key: 'X-CSRF-Token', value: cookie || '' });"
+      ] } }, { "listen": "test", "script": { "exec": [
+        "pm.test('İlan onaylandı', function () { pm.response.to.have.status(200); });"
+      ] } }]
+    },
+    {
+      "name": "11 - Onaylanan ilan public",
+      "request": { "method": "GET", "url": "{{base_url}}/api/v1/listings/{{listing_id}}" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Onaylanan ilan görüntüleniyor', function () { pm.response.to.have.status(200); });"
+      ] } }]
+    }
+  ]
+}

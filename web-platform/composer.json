@@ -1,0 +1,12 @@
+{
+  "name": "tanidikla/platform",
+  "description": "Tanıdıkla web sitesi, REST API ve yönetim paneli",
+  "type": "project",
+  "require": {
+    "php": "^8.4 || ^8.5",
+    "phpmailer/phpmailer": "^7.0"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Tanıdıkla",
+  "short_name": "Tanıdıkla",
+  "description": "Yakınındaki hizmet verenleri ve hizmet taleplerini keşfet.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#061d57",
+  "lang": "tr-TR",
+  "categories": ["business", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/brand/tanidikla-symbol.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

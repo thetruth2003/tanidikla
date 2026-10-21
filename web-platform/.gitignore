@@ -1,0 +1,12 @@
+.env
+/vendor/
+/tools/composer.phar
+/storage/cache/*
+/storage/logs/*
+/storage/uploads/*
+/storage/backups/*
+/storage/postgres/
+!/storage/cache/.gitkeep
+!/storage/logs/.gitkeep
+!/storage/uploads/.gitkeep
+!/storage/backups/.gitkeep
